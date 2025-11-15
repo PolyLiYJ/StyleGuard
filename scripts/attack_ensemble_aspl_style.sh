@@ -43,7 +43,7 @@ accelerate launch --num_processes=4 --gpu_ids="4,5,6,7" --config_file gpu_config
   --pgd_alpha=5e-3 \
   --pgd_eps=5e-2 \
   --target_image_dir  /home/yjli/AIGC/diffusers/StyleGuard/data/target \
-  --style_loss_weight 1
+  --style_loss_weight 0.1
 
 # ------------------------- Train DreamBooth on perturbed examples -------------------------
 export INSTANCE_DIR="$OUTPUT_DIR/noise-ckpt/50"
@@ -94,7 +94,7 @@ accelerate launch \
 python infer.py \
   --model_path $DREAMBOOTH_OUTPUT_DIR \
   --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
-  --prompt "an sks painting of flowers and trees"
+  --prompt "an sks painting including blue sky and mountains"
 
 # python infer.py \
 #   --model_path $DREAMBOOTH_OUTPUT_DIR \

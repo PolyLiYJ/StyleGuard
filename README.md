@@ -118,6 +118,16 @@ CUDA_VISIBLE_DEVICES=-1 python evaluate/eval_precision_new.py \
       --output_folder "$OUTPUT_DIR"
 ```
 
+Compute 
+[CMMD](https://github.com/google-research/google-research/tree/master/cmmd) distance
+```
+conda run -n cmmd python -m cmmd.main --ref_folder=$REF_FOLDER \
+  --gen_folder=$DREAMBOOTH_OUTPUT_DIR/checkpoint-$FINETUNE_STEP-test-infer/an_sks_painting_including_a_house \
+  --max_num=12 \
+  --batch_size=$NUM_GPUS \
+  --output_folder $DREAMBOOTH_OUTPUT_DIR
+```
+
 
 ## Citation
 Details of algorithms and experimental results can be found in our following paper:
