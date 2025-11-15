@@ -1,0 +1,4 @@
+token.txt
+*.pyc
+__pycache__/
+evaluate/fid_ref.npz
