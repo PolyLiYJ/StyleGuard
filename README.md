@@ -2,7 +2,7 @@
 #
 This repository provides the official PyTorch implementation of the following paper: 
 
-### StyleGuard: Preventing Text-to-Image-Model-based Style Mimicry Attacks by Style Perturbations
+# StyleGuard: Preventing Text-to-Image-Model-based Style Mimicry Attacks by Style Perturbations
 
 link: https://arxiv.org/abs/2505.18766
 
@@ -11,6 +11,18 @@ Yanjie Li, Wenxuan Zhang, Xinqi LYU, Yihao LIU, Bin Xiao
 Hong Kong Polytechnic University 
 
 NeurIPS 2025 poster
+
+
+🛡️
+
+**TL;DR**: StyleGuard defends against unauthorized style mimicry in diffusion models (e.g., DreamBooth/Textual Inversion) via **style-aware adversarial perturbations** robust to purification attacks.
+
+## Key Innovations
+- 🎨 **Style Loss**: Latent-space optimization disrupts style transfer while maintaining model-agnostic transferability  
+- ⚔️ **Upscale Loss**: Ensemble purification resistance via adversarial training with upscalers/purifiers  
+- 🏆 **SOTA Robustness**: Outperforms Glaze/Anti-DreamBooth against:
+  - Random transformations (blur, JPEG, etc.)
+  - Diffusion purification (DiffPure, Noise Upscaling)  
 
 #
 
