@@ -161,7 +161,7 @@ Details of algorithms and experimental results can be found in our following pap
 
 
 ## Acknowledgement
-This repo is heavil based on [Anti-DB](https://github.com/VinAIResearch/Anti-DreamBooth) and [SimAC](https://github.com/somuchtome/SimAC). Thanks for their impressive works!
+This repo is based on [Anti-DB](https://github.com/VinAIResearch/Anti-DreamBooth) and [SimAC](https://github.com/somuchtome/SimAC). Thanks for their impressive works!
 
 
 ## Contacts
