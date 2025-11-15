@@ -51,6 +51,7 @@ export INSTANCE_DIR="$OUTPUT_DIR/noise-ckpt/50"
 export INPUT_FOLDER="outputs/style/wikiart/$EXPERIMENT_NAME/noise-ckpt/50"
 export UPSCALE_DIR="outputs/style/wikiart/$EXPERIMENT_NAME/noise-upscale-new/"
 
+# use a different upscaling method
 python Noisy_Upscaling.py \
   --input_folder=$INPUT_FOLDER \
   --output_folder=$UPSCALE_DIR \
@@ -65,7 +66,7 @@ accelerate launch \
   --config_file gpu_config.yaml \
   --main_process_port=8831 \
   dreambooth/train_dreambooth.py \
-  --pretrained_model_name_or_path=$sd15_path \
+  --pretrained_model_name_or_path=$sd14_path \
   --enable_xformers_memory_efficient_attention \
   --train_text_encoder \
   --instance_data_dir="/home/yjli/AIGC/diffusers/SimAC/outputs/style/wikiart/$EXPERIMENT_NAME/noise-upscale-new" \

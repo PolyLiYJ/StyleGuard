@@ -322,7 +322,7 @@ def parse_args(input_args=None):
     )
     parser.add_argument(
         "--pgd_eps",
-        type=int,
+        type=float,
         default=0.05,
         help="The noise budget for pgd.",
     )
@@ -562,7 +562,8 @@ def pgd_attack(
         loss.backward()
 
         alpha = args.pgd_alpha 
-        eps = args.pgd_eps / 255
+        # eps = args.pgd_eps / 255
+        eps = args.pgd_eps
 
         adv_images = perturbed_images + alpha * perturbed_images.grad.sign()
         eta = torch.clamp(adv_images - original_images, min=-eps, max=+eps)

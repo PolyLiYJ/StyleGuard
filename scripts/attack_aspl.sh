@@ -1,21 +1,17 @@
 # export MODEL_PATH="stabilityai/stable-diffusion-2-1-base"
 export MODEL_PATH="CompVis/stable-diffusion-v1-4"
 export EXPERIMENT_NAME="anti-dreambooth"
-# export CLEAN_TRAIN_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_A" 
-# export CLEAN_ADV_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_B"
-export OUTPUT_DIR="outputs/anti-dreambooth/CelebA-HQ/$EXPERIMENT_NAME"
-# export CLASS_DIR="data/class-person"
-export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small" 
-export CLEAN_ADV_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small"
-export OUTPUT_DIR="/home/yjli/AIGC/diffusers/SimAC/outputs/style/wikiart/$EXPERIMENT_NAME"
-export CLASS_DIR="/home/yjli/AIGC/diffusers/SimAC/data/wikiart/reference"
-
+export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/StyleGuard/data/wikiart/vangogh" 
+export CLEAN_ADV_DIR="/home/yjli/AIGC/diffusers/StyleGuard/data/wikiart/vangogh"
+export OUTPUT_DIR="/home/yjli/AIGC/diffusers/StyleGuard/outputs/style/wikiart/$EXPERIMENT_NAME"
+export CLASS_DIR="/home/yjli/AIGC/diffusers/StyleGuard/data/wikiart/reference"
+# TOKEN=$(cat token.txt)  # Reads token directly
+# export HUGGING_FACE_HUB_TOKEN="$TOKEN"
 # ------------------------- Train ASPL on set B -------------------------
 mkdir -p $OUTPUT_DIR
-cp -r $CLEAN_TRAIN_DIR $OUTPUT_DIR/image_clean
-cp -r $CLEAN_ADV_DIR $OUTPUT_DIR/image_before_addding_noise
+export CUDA_VISIBLE_DEVICES="4,5,6,7"
     
-accelerate launch --num_processes=2 --gpu_ids="3,4" --config_file gpu_config.yaml --main_process_port=8831 attacks/aspl.py \
+accelerate launch --num_processes=4 --gpu_ids="0,1,2,3" --config_file gpu_config.yaml --main_process_port=8835 attacks/aspl.py \
   --pretrained_model_name_or_path=$MODEL_PATH  \
   --enable_xformers_memory_efficient_attention \
   --instance_data_dir_for_train=$CLEAN_TRAIN_DIR \
@@ -37,17 +33,27 @@ accelerate launch --num_processes=2 --gpu_ids="3,4" --config_file gpu_config.yam
   --checkpointing_iterations=10 \
   --learning_rate=5e-7 \
   --pgd_alpha=0.005 \
-  --pgd_eps=16 \
+  --pgd_eps=0.05 \
   --seed=0
 
+# ------------------------- Train DreamBooth on perturbed examples -------------------------
 export INSTANCE_DIR="$OUTPUT_DIR/noise-ckpt/50"
-export DREAMBOOTH_OUTPUT_DIR="dreambooth-outputs/anti-dreambooth/CelebA-HQ/$EXPERIMENT_NAME"
+export UPSCALE_DIR="$OUTPUT_DIR/noise-upscale-new/"
 
-accelerate --gpu_ids="5,6" launch train_dreambooth.py \
+# use a different upscaling method
+python Noisy_Upscaling.py \
+  --input_folder=$INPUT_FOLDER \
+  --output_folder=$UPSCALE_DIR \
+  --upscaler="x2" \
+  --step=100
+
+export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/anti-style/$EXPERIMENT_NAME/SD14"
+
+accelerate --gpu_ids="0,1,2,3" launch train_dreambooth.py \
   --pretrained_model_name_or_path=$MODEL_PATH  \
   --enable_xformers_memory_efficient_attention \
   --train_text_encoder \
-  --instance_data_dir=$INSTANCE_DIR \
+  --instance_data_dir=$UPSCALE_DIR \
   --class_data_dir=$CLASS_DIR \
   --output_dir=$DREAMBOOTH_OUTPUT_DIR \
   --with_prior_preservation \
@@ -72,5 +78,6 @@ accelerate --gpu_ids="5,6" launch train_dreambooth.py \
   
 python infer.py \
   --model_path $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000 \
-  --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer
+  --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
+  --prompt "an sks painting including blue sky and mountains"
 

@@ -832,15 +832,10 @@ def main(args):
         #print("total_samples:", total_samples)
         effective_bs = min(batch_size, total_samples)
         num_batches = ceil(total_samples / effective_bs)
-        #print("num_batches:", num_batches)
 
         for batch_idx in range(0,num_batches):
             start = batch_idx * effective_bs
             end = min((batch_idx+1)*effective_bs, total_samples)
-            # print("batch_idx", batch_idx)
-            # print("start: ", start, "end:", end)
-            # print("perturbed_data length:", perturbed_data.shape)
-            # 
 
             perturbed_data_batch = perturbed_data[start:end]
             # print("perturbed_data_batch shape", perturbed_data_batch.shape)
