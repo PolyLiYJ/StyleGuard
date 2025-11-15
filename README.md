@@ -101,6 +101,8 @@ To defense Stable Diffusion version 1.4 (default), you can run
 bash scripts/attack_ensemble_aspl_style.sh
 ```
 
+It is supposed to take about an hour if run on 8 gpus.
+
 Our dreambooth code is from the diffusers library. Please refer to the [diffusers](https://github.com/huggingface/diffusers/tree/main/examples/dreambooth) for more details.
 
 Inference: generates examples with prompt
