@@ -7,15 +7,7 @@
 # ------------------------- Train ASPL on set B -------------------------
 # export EXPERIMENT_NAME="vangogh_ensemble_ASPL_style_loss_upscaling"
 export EXPERIMENT_NAME="antidreambooth"
-
-# 在diffusion model 2-1上计算噪声
-# export MODEL_PATH="stabilityai/stable-diffusion-2-1-base"
 export MODEL_PATH="CompVis/stable-diffusion-v1-4"
-export HUGGINGFACE_TOKEN="***REMOVED***"
-# export CLEAN_TRAIN_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_A" 
-# export CLEAN_ADV_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_B"
-# export OUTPUT_DIR="outputs/simac/CelebA-HQ/$EXPERIMENT_NAME"
-# export CLASS_DIR="clean_class_image"
 export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small" 
 export CLEAN_ADV_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small"
 export OUTPUT_DIR="/home/yjli/AIGC/diffusers/SimAC/outputs/style/wikiart/$EXPERIMENT_NAME"

@@ -40,14 +40,7 @@ for BUDGET in 0 0.0078 0.015; do
 
     # export EXPERIMENT_NAME="vangogh_StyleGuard_style_loss_upscaling_ablation_styleweight_${STYLE_WEIGHT}"
     export EXPERIMENT_NAME="vangogh_StyleGuard_style_loss_upscaling_ablation_budget_${BUDGET}"
-
-    # 在diffusion model 2-1上计算噪声
-    # export MODEL_PATH="stabilityai/stable-diffusion-2-1-base"
     export MODEL_PATH="CompVis/stable-diffusion-v1-4"
-    # export CLEAN_TRAIN_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_A" 
-    # export CLEAN_ADV_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_B"
-    # export OUTPUT_DIR="outputs/simac/CelebA-HQ/$EXPERIMENT_NAME"
-    # export CLASS_DIR="clean_class_image"
     export OUTPUT_DIR="/home/yjli/AIGC/diffusers/SimAC/outputs/style/wikiart/$EXPERIMENT_NAME"
 
     # ------------------------- Train E-ASPL on set B -------------------------
