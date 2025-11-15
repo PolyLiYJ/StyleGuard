@@ -12,6 +12,8 @@ export EXPERIMENT_NAME="test_lora"
 # export MODEL_PATH="stabilityai/stable-diffusion-2-1-base"
 export MODEL_PATH="CompVis/stable-diffusion-v1-4"
 # export MODEL_PATH="stabilityai/stable-diffusion-xl-base-1.0"
+
+export HUGGINGFACE_TOKEN="***REMOVED***"
 # export CLEAN_TRAIN_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_A" 
 # export CLEAN_ADV_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_B"
 # export OUTPUT_DIR="outputs/simac/CelebA-HQ/$EXPERIMENT_NAME"
