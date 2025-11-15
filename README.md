@@ -94,6 +94,7 @@ There are two face datasets: VGGFace2 and CelebA-HQ which are provided at [here]
 For convenient testing, we have provided a split set of one subject in CelebA-HQ at `./data/CelebA-HQ/103` as the Anti-dreambooth does.
 
 ## How to run
+The below script is designed to demonstrate the entire process of using StyleGuard for protecting artistic styles against style mimicry attacks. It includes steps to generate protective noises using StyleGuard, using Noise Upscaler to try to remove the protective noises, and then fine-tuning a model (DreamBooth) on these "denoised" examples. The final step involves generating test images to verify the effectiveness of the defense.
 
 To defense Stable Diffusion version 1.4 (default), you can run
 ```
