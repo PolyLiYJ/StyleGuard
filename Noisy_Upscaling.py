@@ -13,20 +13,8 @@ from huggingface_hub import login
 from diffusers import FluxControlNetModel
 from diffusers.pipelines import FluxControlNetPipeline
 import os
-from dotenv import load_dotenv
 
-# 加载 .env 文件
-load_dotenv()
-
-# 读取 Hugging Face Token
 HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-
-# Hugging Face 登录
-from huggingface_hub import login
-login(token=HUGGINGFACE_TOKEN)
-
-
-
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image_tensor, mean=0, std=0.1):

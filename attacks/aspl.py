@@ -571,6 +571,48 @@ def pgd_attack(
         print(f"PGD loss - step {step}, loss: {loss.detach().item()}")
     return perturbed_images
 
+def load_model(args, model_path):
+    print(model_path)
+    # import correct text encoder class
+    text_encoder_cls = import_model_class_from_model_name_or_path(model_path, args.revision)
+
+    # Load scheduler and models
+    text_encoder = text_encoder_cls.from_pretrained(
+        model_path,
+        subfolder="text_encoder",
+        revision=args.revision,
+    )
+    unet = UNet2DConditionModel.from_pretrained(model_path, subfolder="unet", revision=args.revision)
+
+    # num_iters = 100
+    # num_train_steps = 20
+    # num_pgd_attack_steps = 20
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_path,
+        subfolder="tokenizer",
+        revision=args.revision,
+        use_fast=False,
+    )
+
+    noise_scheduler = DDPMScheduler.from_pretrained(model_path, subfolder="scheduler")
+
+    vae = AutoencoderKL.from_pretrained(model_path, subfolder="vae", revision=args.revision)
+
+    vae.requires_grad_(False)
+
+    if not args.train_text_encoder:
+        text_encoder.requires_grad_(False)
+
+    if args.enable_xformers_memory_efficient_attention:
+        print("You selected to used efficient xformers")
+        print("Make sure to install the following packages before continue")
+        print("pip install triton==2.0.0.dev20221031")
+        print("pip install pip install xformers==0.0.17.dev461")
+
+        unet.enable_xformers_memory_efficient_attention()
+
+    return text_encoder, unet, tokenizer, noise_scheduler, vae
 
 def main(args):
     #logging_dir = Path(args.output_dir, args.logging_dir)
@@ -646,36 +688,48 @@ def main(args):
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-    # import correct text encoder class
-    text_encoder_cls = import_model_class_from_model_name_or_path(args.pretrained_model_name_or_path, args.revision)
+    # # import correct text encoder class
+    # text_encoder_cls = import_model_class_from_model_name_or_path(args.pretrained_model_name_or_path, args.revision)
 
-    # Load scheduler and models
-    text_encoder = text_encoder_cls.from_pretrained(
-        args.pretrained_model_name_or_path,
-        subfolder="text_encoder",
-        revision=args.revision,
-    )
-    unet = UNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
-    )
+    # # Load scheduler and models
+    # text_encoder = text_encoder_cls.from_pretrained(
+    #     args.pretrained_model_name_or_path,
+    #     subfolder="text_encoder",
+    #     revision=args.revision,
+    # )
+    # unet = UNet2DConditionModel.from_pretrained(
+    #     args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
+    # )
+    
+    model_paths = list(args.pretrained_model_name_or_path.split(","))
+    num_models = len(model_paths)
+    
+    MODEL_BANKS = [load_model(args, path) for path in model_paths]
+    MODEL_STATEDICTS = [
+        {
+            "text_encoder": MODEL_BANKS[i][0].state_dict(),
+            "unet": MODEL_BANKS[i][1].state_dict(),
+        }
+        for i in range(num_models)
+    ]
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path,
-        subfolder="tokenizer",
-        revision=args.revision,
-        use_fast=False,
-    )
+    # tokenizer = AutoTokenizer.from_pretrained(
+    #     args.pretrained_model_name_or_path,
+    #     subfolder="tokenizer",
+    #     revision=args.revision,
+    #     use_fast=False,
+    # )
 
-    noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
+    # noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
 
-    vae = AutoencoderKL.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision
-    ).cuda()
+    # vae = AutoencoderKL.from_pretrained(
+    #     args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision
+    # ).cuda()
 
-    vae.requires_grad_(False)
+    # vae.requires_grad_(False)
 
-    if not args.train_text_encoder:
-        text_encoder.requires_grad_(False)
+    # if not args.train_text_encoder:
+    #     text_encoder.requires_grad_(False)
 
     if args.allow_tf32:
         torch.backends.cuda.matmul.allow_tf32 = True
@@ -693,12 +747,6 @@ def main(args):
     original_data = perturbed_data.clone()
     original_data.requires_grad_(False)
 
-    if args.enable_xformers_memory_efficient_attention:
-        if is_xformers_available():
-            unet.enable_xformers_memory_efficient_attention()
-        else:
-            raise ValueError("xformers is not available. Make sure it is installed correctly")
-
     target_latent_tensor = None
     if args.target_image_path is not None:
         target_image_path = Path(args.target_image_path)
@@ -713,40 +761,77 @@ def main(args):
         )
         target_latent_tensor = target_latent_tensor.repeat(len(perturbed_data), 1, 1, 1).cuda()
 
-    f = [unet, text_encoder]
-    for i in range(args.max_train_steps):
-        # 1. f' = f.clone()
-        f_sur = copy.deepcopy(f)
-        f_sur = train_one_epoch(
-            args,
-            f_sur,
-            tokenizer,
-            noise_scheduler,
-            vae,
-            clean_data,
-            args.max_f_train_steps,
-        )
-        perturbed_data = pgd_attack(
-            args,
-            f_sur,
-            tokenizer,
-            noise_scheduler,
-            vae,
-            perturbed_data,
-            original_data,
-            target_latent_tensor,
-            args.max_adv_train_steps,
-        )
-        f = train_one_epoch(
-            args,
-            f,
-            tokenizer,
-            noise_scheduler,
-            vae,
-            perturbed_data,
-            args.max_f_train_steps,
-        )
 
+    batch_size = 4
+    from math import ceil
+
+    for i in tqdm(range(args.max_train_steps)):
+        total_samples = len(perturbed_data)
+        #print("total_samples:", total_samples)
+        effective_bs = min(batch_size, total_samples)
+        num_batches = ceil(total_samples / effective_bs)
+
+        for batch_idx in range(0,num_batches):
+            start = batch_idx * effective_bs
+            end = min((batch_idx+1)*effective_bs, total_samples)
+
+            perturbed_data_batch = perturbed_data[start:end]
+            # print("perturbed_data_batch shape", perturbed_data_batch.shape)
+            clean_data_batch = clean_data[start:end]
+            original_data_batch = original_data[start:end]
+            
+            en_data = 0.0
+
+            for j, model_path in enumerate(model_paths):
+                text_encoder, unet, tokenizer, noise_scheduler, vae = MODEL_BANKS[j]
+                unet.load_state_dict(MODEL_STATEDICTS[j]["unet"])
+                text_encoder.load_state_dict(MODEL_STATEDICTS[j]["text_encoder"])
+                f = [unet, text_encoder]
+                f_sur = copy.deepcopy(f)
+                f_sur = train_one_epoch(
+                    args,
+                    f_sur,
+                    tokenizer,
+                    noise_scheduler,
+                    vae,
+                    clean_data_batch,
+                    args.max_f_train_steps,
+                )
+                perturbed_data_f_batch = pgd_attack(
+                    args,
+                    f_sur,
+                    tokenizer,
+                    noise_scheduler,
+                    vae,
+                    perturbed_data_batch,
+                    original_data_batch,
+                    target_latent_tensor, 
+                    args.max_adv_train_steps
+                )
+
+                en_data += perturbed_data_f_batch / num_models
+
+                f = train_one_epoch(
+                    args,
+                    f,
+                    tokenizer,
+                    noise_scheduler,
+                    vae,
+                    perturbed_data_f_batch,
+                    args.max_f_train_steps,
+                )
+
+                # save new statedicts
+                MODEL_STATEDICTS[j]["unet"] = f[0].state_dict()
+                MODEL_STATEDICTS[j]["text_encoder"] = f[1].state_dict()
+
+                del f
+                del text_encoder, unet, tokenizer, noise_scheduler, vae
+
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+            perturbed_data[start:end] = en_data.clone().detach()
+            del en_data
         if (i + 1) % args.checkpointing_iterations == 0:
             save_folder = f"{args.output_dir}/noise-ckpt/{i+1}"
             os.makedirs(save_folder, exist_ok=True)
