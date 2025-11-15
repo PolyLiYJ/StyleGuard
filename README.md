@@ -75,10 +75,12 @@ Pretrained checkpoints of different Stable Diffusion versions can be **downloade
   </tr>
   <tr>
     <td>stabilityai/sd-x2-latent-upscaler</td>
-    <td><a href="https://huggingface.co/stabilityai/sd-x2-latent-upscaler">stable-diffusion-x4-upscaler</a></td>
+    <td><a href="https://huggingface.co/stabilityai/sd-x2-latent-upscaler">stabilityai/sd-x2-latent-upscaler</a></td>
   </tr>
 
 </table>
+
+The DiffPure Model can be downloaded from [here](https://github.com/NVlabs/DiffPure?tab=readme-ov-file).Weu use the Guided Diffusion for ImageNet.
 
 Please download the pretrain weights and define "$MODEL_PATH" in the script. 
 
@@ -140,6 +142,11 @@ conda run -n cmmd python -m cmmd.main --ref_folder=$REF_FOLDER \
   --output_folder $DREAMBOOTH_OUTPUT_DIR
 ```
 
+run baselines (Anti-DreamBooth, SimAC)
+```
+bash attack_aspl.sh
+bash attack_simac.sh
+```
 
 ## Citation
 Details of algorithms and experimental results can be found in our following paper:
@@ -154,7 +161,7 @@ Details of algorithms and experimental results can be found in our following pap
 
 
 ## Acknowledgement
-This repo is heavil based on [Anti-DB](https://github.com/VinAIResearch/Anti-DreamBooth) and [SimAC](https://arxiv.org/abs/2312.07865). Thanks for their impressive works!
+This repo is heavil based on [Anti-DB](https://github.com/VinAIResearch/Anti-DreamBooth) and [SimAC](https://github.com/somuchtome/SimAC). Thanks for their impressive works!
 
 
 ## Contacts

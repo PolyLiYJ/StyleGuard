@@ -1,12 +1,4 @@
-# export EXPERIMENT_NAME="E-ASPL"
-# export MODEL_PATH="./stable-diffusion/stable-diffusion-2-1-base"
-# export CLEAN_TRAIN_DIR="data/n000050/set_A" 
-# export CLEAN_ADV_DIR="data/n000050/set_B"
-# export OUTPUT_DIR="outputs/$EXPERIMENT_NAME/n000050_ADVERSARIAL"
-# export CLASS_DIR="data/class-person"
-# ------------------------- Train ASPL on set B -------------------------
-# 0 2/255 4/255 8/255 6/255 32/255
-# for BUDGET in 0.031 0.063 0.125; do  
+
 export BUGET=0.05
 export STYLE_WEIGHT=1
 export EPOCH=20
@@ -19,17 +11,9 @@ export TRAIN_MODEL="SD15"
 
 export EXPERIMENT_NAME="SimAC_transform_baseline"
 
-# 在diffusion model 2-1上计算噪声
-# export MODEL_PATH="stabilityai/stable-diffusion-2-1-base"
+# compute perturbation on diffusion model 1-4
 export MODEL_PATH="CompVis/stable-diffusion-v1-4"
 export HUGGINGFACE_TOKEN="***REMOVED***"
-# export CLEAN_TRAIN_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_A" 
-# export CLEAN_ADV_DIR="data/CelebA-HQ/$EXPERIMENT_NAME/set_B"
-# export OUTPUT_DIR="outputs/simac/CelebA-HQ/$EXPERIMENT_NAME"
-# export CLASS_DIR="clean_class_image"
-
-# export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small" 
-# export CLEAN_ADV_DIR="/home/yjli/AIGC/diffusers/image_van_gogh_small"
 #export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/SimAC/data/wikiart/vangogh"
 #export CLEAN_ADV_DIR="/home/yjli/AIGC/diffusers/SimAC/data/wikiart/vangogh"
 export CLEAN_TRAIN_DIR="/home/yjli/AIGC/diffusers/SimAC/data/image_van_gogh_small"
@@ -51,32 +35,32 @@ export ref_model_path="${sd14_path},${sd15_path},${su_upscale_path}"
 
 mkdir -p $OUTPUT_DIR
 
+
+# from SimAC official repo
 export CUDA_VISIBLE_DEVICES=$GPU
-# accelerate launch --num_processes=2 --config_file gpu_config.yaml --main_process_port=$MAIN_PROCESS_PORT attacks/ensemble_aspl_time.py \
-#   --pretrained_model_name_or_path="${sd14_path},${su_upscale_path}" \
-#   --enable_xformers_memory_efficient_attention \
-#   --instance_data_dir_for_train=$CLEAN_TRAIN_DIR \
-#   --instance_data_dir_for_adversarial=$CLEAN_ADV_DIR \
-#   --instance_prompt="a painting of sks" \
-#   --class_data_dir=$CLASS_DIR \
-#   --num_class_images=100 \
-#   --class_prompt="a painting" \
-#   --output_dir=$OUTPUT_DIR \
-#   --center_crop \
-#   --with_prior_preservation \
-#   --prior_loss_weight=1.0 \
-#   --resolution=512 \
-#   --train_text_encoder \
-#   --train_batch_size=1 \
-#   --max_train_steps=$EPOCH \
-#   --max_f_train_steps=10 \
-#   --max_adv_train_steps=5 \
-#   --checkpointing_iterations=$EPOCH \
-#   --learning_rate=5e-7 \
-#   --pgd_alpha=5e-3 \
-#   --pgd_eps=$BUDGET \
-#   --target_image_dir="/home/yjli/AIGC/diffusers/SimAC/data/target" \
-#   --style_loss_weight=$STYLE_WEIGHT
+accelerate launch --num_processes=2 --config_file gpu_config.yaml --main_process_port=$MAIN_PROCESS_PORT attacks/time_feature.py \
+  --pretrained_model_name_or_path="${sd14_path}" \
+  --enable_xformers_memory_efficient_attention \
+  --instance_data_dir_for_train=$CLEAN_TRAIN_DIR \
+  --instance_data_dir_for_adversarial=$CLEAN_ADV_DIR \
+  --instance_prompt="a painting of sks" \
+  --class_data_dir=$CLASS_DIR \
+  --num_class_images=100 \
+  --class_prompt="a painting" \
+  --output_dir=$OUTPUT_DIR \
+  --center_crop \
+  --with_prior_preservation \
+  --prior_loss_weight=1.0 \
+  --resolution=512 \
+  --train_text_encoder \
+  --train_batch_size=1 \
+  --max_train_steps=$EPOCH \
+  --max_f_train_steps=10 \
+  --max_adv_train_steps=5 \
+  --checkpointing_iterations=$EPOCH \
+  --learning_rate=5e-7 \
+  --pgd_alpha=5e-3 \
+  --pgd_eps=$BUDGET \
 
 
 # evlaute the runing time of SIMAC
@@ -118,7 +102,7 @@ for CROP in 1;do
           UPSCALE_WEIGHT=10
           K1=5
           K2=10
-           export BUDGET=0.05
+          export BUDGET=0.05
           export GPU="4,5"
           export EPOCH=20
           export STYLE_WEIGHT=1
