@@ -52,8 +52,8 @@ export CUDA_VISIBLE_DEVICES="4,5,6,7"
 
 accelerate launch \
   --num_processes=4 \
-  --gpu_ids="4,5,6,7" \
   --config_file gpu_config.yaml \
+  --gpu_ids="4,5,6,7" \
   --main_process_port=8838 \
   ../../diffusers/examples/dreambooth/train_dreambooth.py \
   --pretrained_model_name_or_path=$MODEL_PATH  \
@@ -85,5 +85,6 @@ accelerate launch \
 python infer.py \
   --model_path $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000 \
   --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
-  --prompt "an sks painting including blue sky and mountains"
+  --prompt "an sks painting including blue sky and mountains" \
+  --seed 42
 

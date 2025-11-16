@@ -94,8 +94,9 @@ accelerate launch \
 
 python infer.py \
   --model_path $DREAMBOOTH_OUTPUT_DIR \
-  --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
-  --prompt "an sks painting including blue sky and mountains"
+  --output_dir outputs/style/wikiart/$EXPERIMENT_NAME/checkpoint-1000-test-infer \
+  --prompt "an sks painting including blue sky and mountains" \
+  --seed 42
 
 # python infer.py \
 #   --model_path $DREAMBOOTH_OUTPUT_DIR \
