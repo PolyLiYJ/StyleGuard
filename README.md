@@ -187,7 +187,7 @@ bash attack_aspl.sh
 bash attack_simac.sh
 ```
 
-Test on the Official implementation of [Noise Upscaleing](https://github.com/ethz-spylab/robust-style-mimicry?tab=readme-ov-file#robust-mimicry-methods):
+Test on the Official implementation of [Noise Upscaling](https://github.com/ethz-spylab/robust-style-mimicry?tab=readme-ov-file#robust-mimicry-methods):
 
 ```bash
 git clone https://github.com/ethz-spylab/robust-style-mimicry.git
