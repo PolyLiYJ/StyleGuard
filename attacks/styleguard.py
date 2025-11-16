@@ -591,7 +591,8 @@ def pgd_attack(
     original_images: torch.Tensor,
     num_steps: int,
     target_mean=None,
-    target_var=None
+    target_var=None,
+
 ):
     """Return new perturbed data"""
 
@@ -605,6 +606,12 @@ def pgd_attack(
 
     perturbed_images = data_tensor.detach().clone()
     perturbed_images.requires_grad_(True)
+    original_latents = vae.encode(data_tensor.to(device, dtype=weight_dtype)).latent_dist.sample()
+    original_latents = original_latents * vae.config.scaling_factor  # N=4, C, 64, 64
+        
+    if args.style_loss_weight > 0:
+        original_mean = original_latents.mean(dim=[0, 2, 3])  # type: ignore
+        original_var = original_latents.var(dim=[0, 2, 3])     # type: ignore
 
     input_ids = tokenizer(
         args.instance_prompt,
@@ -626,7 +633,9 @@ def pgd_attack(
             current_mean = latents.mean(dim=[0, 2, 3])  # type: ignore
             current_var = latents.var(dim=[0, 2, 3])     # type: ignore
 
-            style_loss = (-F.mse_loss(current_mean, target_mean.to(current_mean.device, dtype=weight_dtype)) -
+            style_loss = (F.mse_loss(current_mean, original_mean.to(current_mean.device, dtype=weight_dtype)) +
+                            F.mse_loss(current_var, original_var.to(current_var.device, dtype=weight_dtype))
+                            -F.mse_loss(current_mean, target_mean.to(current_mean.device, dtype=weight_dtype)) -
                             F.mse_loss(current_var, target_var.to(current_var.device, dtype=weight_dtype))) * args.style_loss_weight
         
         print("unet.config.in_channels:", unet.config.in_channels )
@@ -826,7 +835,7 @@ def main(args):
     ]
     
     from math import ceil
-    batch_size = 4
+    batch_size = args.train_batch_size
     for i in tqdm(range(args.max_train_steps)):
         total_samples = len(perturbed_data)
         #print("total_samples:", total_samples)
