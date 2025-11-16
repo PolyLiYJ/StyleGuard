@@ -45,7 +45,8 @@ def noisy_upscaling(args, image_path, upscaler_model, contronet=None):
     if args.upscaler=="x4":
         upscaler_model = upscaler_model.to(args.device)
         noisy_image_tensor=noisy_image_tensor.to(args.device)
-        upscaled_image = upscaler_model(prompt = "a painting", image = noisy_image_tensor, num_inference_steps = args.step, noise_level = 20).images[0]
+        # upscaled_image = upscaler_model(prompt = "a painting", image = noisy_image_tensor, num_inference_steps = args.step, noise_level = 20).images[0]
+        upscaled_image = upscaler_model(prompt = "a painting", image = noisy_image_tensor, noise_level=320).images[0]
     elif args.upscaler=="x2":
         generator = torch.manual_seed(33)
         prompt = "a painting"
