@@ -46,7 +46,6 @@ accelerate launch --num_processes=4 --gpu_ids="4,5,6,7" --config_file gpu_config
   --style_loss_weight 0.1
 
 # ------------------------- Train DreamBooth on perturbed examples -------------------------
-export INSTANCE_DIR="$OUTPUT_DIR/noise-ckpt/50"
 
 export INPUT_FOLDER="outputs/style/wikiart/$EXPERIMENT_NAME/noise-ckpt/50"
 export UPSCALE_DIR="outputs/style/wikiart/$EXPERIMENT_NAME/noise-upscale-new/"
@@ -58,23 +57,23 @@ python Noisy_Upscaling.py \
   --upscaler="x2" \
   --step=100
 
-export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/anti-style/$EXPERIMENT_NAME/SD14"
+export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/styleguard/$EXPERIMENT_NAME/SD14"
 
 accelerate launch \
   --num_processes=2 \
   --gpu_ids="1,2" \
   --config_file gpu_config.yaml \
-  --main_process_port=8831 \
-  dreambooth/train_dreambooth.py \
+  --main_process_port=8834 \
+  ../../diffusers/examples/dreambooth/train_dreambooth.py \
   --pretrained_model_name_or_path=$sd14_path \
   --enable_xformers_memory_efficient_attention \
   --train_text_encoder \
-  --instance_data_dir="/home/yjli/AIGC/diffusers/SimAC/outputs/style/wikiart/$EXPERIMENT_NAME/noise-upscale-new" \
+  --instance_data_dir=$UPSCALE_DIR \
   --class_data_dir=$CLASS_DIR \
   --output_dir=$DREAMBOOTH_OUTPUT_DIR \
   --with_prior_preservation \
   --prior_loss_weight=1.0 \
-  --instance_prompt="an sks painting" \
+  --instance_prompt="a sks painting" \
   --class_prompt="a painting" \
   --resolution=512 \
   --train_batch_size=2 \
@@ -90,6 +89,7 @@ accelerate launch \
   --mixed_precision=fp16 \
   --prior_generation_precision=fp16 \
   --sample_batch_size=1 \
+  --seed=0 \
   --snr_gamma=1.5
 
 python infer.py \

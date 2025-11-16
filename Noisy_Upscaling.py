@@ -108,8 +108,8 @@ def main():
     output_path = args.output_folder
 
     os.makedirs(output_path, exist_ok=True)
+    print(f"input_folder: {directory_path}")
 
-    # 列出所有文件
     files = os.listdir(directory_path)
     with torch.no_grad():
         if args.upscaler=="x4":
