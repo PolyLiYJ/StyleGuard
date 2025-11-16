@@ -2,4 +2,4 @@ token.txt
 *.pyc
 __pycache__/
 evaluate/fid_ref.npz
-outputs/style/wikiart/anti-dreambooth
+/media/ssd1/yjli

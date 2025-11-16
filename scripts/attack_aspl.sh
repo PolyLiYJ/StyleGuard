@@ -48,12 +48,12 @@ python Noisy_Upscaling.py \
   --step=100
 
 export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/styleguard/$EXPERIMENT_NAME/SD14"
-export CUDA_VISIBLE_DEVICES="4,5,6,7"
+export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 
 accelerate launch \
-  --num_processes=4 \
+  --num_processes=8 \
+  --gpu_ids="0,1,2,3,4,5,6,7" \
   --config_file gpu_config.yaml \
-  --gpu_ids="4,5,6,7" \
   --main_process_port=8838 \
   ../../diffusers/examples/dreambooth/train_dreambooth.py \
   --pretrained_model_name_or_path=$MODEL_PATH  \
@@ -76,8 +76,8 @@ accelerate launch \
   --max_train_steps=1000 \
   --checkpointing_steps=1000 \
   --center_crop \
-  --mixed_precision=bf16 \
-  --prior_generation_precision=bf16 \
+  --mixed_precision=fp16 \
+  --prior_generation_precision=fp16 \
   --sample_batch_size=1 \
   --seed=0 \
   --snr_gamma=1.5

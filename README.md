@@ -24,6 +24,20 @@ NeurIPS 2025 poster
   - Random transformations (blur, JPEG, etc.)
   - Diffusion purification (DiffPure, Noise Upscaling)  
 
+Below are example images from the code's output folder:
+
+### Clean Image
+![Clean Image](data/wikiart/vangogh/00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)
+
+### Protected Image
+![Protected Image](outputs/style/wikiart/anti-dreambooth/noise-ckpt/50/50_noise_00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)
+
+### Clean Generated Image by DreamBooth-based Finetuning （prompt：A sks painting of a mountain landscale with a blue sky）
+![Clean Generated Image](outputs/clean/A-sks-painting-of-a-mountain-landscale-with-a-blue-sky.png)
+
+### Adversarial Generated Image by DreamBooth-based Finetuning （prompt：A sks painting of a mountain landscale with a blue sky）
+![Adversarial Generated Image](outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/checkpoint-1000-test-infer/image_1.png)
+
 #
 
 ##### Table of contents
