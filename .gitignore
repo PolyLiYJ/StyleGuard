@@ -4,3 +4,6 @@ __pycache__/
 evaluate/fid_ref.npz
 /media/ssd1/yjli
 outputs/style/wikiart/anti-dreambooth
+outputs/style/wikiart/
+diffusers_repo
+robust-style-mimicry
