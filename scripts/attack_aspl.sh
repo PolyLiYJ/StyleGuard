@@ -44,17 +44,17 @@ export UPSCALE_DIR="$OUTPUT_DIR/noise-upscale-new/"
 python Noisy_Upscaling.py \
   --input_folder=$INPUT_FOLDER \
   --output_folder=$UPSCALE_DIR \
-  --upscaler="x2" \
+  --upscaler="x4" \
   --step=100
 
 export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/styleguard/$EXPERIMENT_NAME/SD14"
 export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 
 accelerate launch \
+  --config_file gpu_config.yaml \
   --num_processes=8 \
   --gpu_ids="0,1,2,3,4,5,6,7" \
-  --config_file gpu_config.yaml \
-  --main_process_port=8838 \
+  --main_process_port=8839 \
   ../../diffusers/examples/dreambooth/train_dreambooth.py \
   --pretrained_model_name_or_path=$MODEL_PATH  \
   --enable_xformers_memory_efficient_attention \
@@ -64,10 +64,10 @@ accelerate launch \
   --output_dir=$DREAMBOOTH_OUTPUT_DIR \
   --with_prior_preservation \
   --prior_loss_weight=1.0 \
-  --instance_prompt="a painting" \
-  --class_prompt="a sks painting" \
+  --instance_prompt="a sks painting" \
+  --class_prompt="a painting" \
   --resolution=512 \
-  --train_batch_size=2 \
+  --train_batch_size=1 \
   --gradient_accumulation_steps=1 \
   --learning_rate=5e-6 \
   --lr_scheduler="constant" \
@@ -83,8 +83,8 @@ accelerate launch \
   --snr_gamma=1.5
   
 python infer.py \
-  --model_path $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000 \
-  --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
+  --model_path $DREAMBOOTH_OUTPUT_DIR \
+  --output_dir outputs/style/wikiart/$EXPERIMENT_NAME/checkpoint-1000-test-infer \
   --prompt "an sks painting including blue sky and mountains" \
   --seed 42
 

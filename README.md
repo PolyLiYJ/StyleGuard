@@ -101,6 +101,10 @@ Pretrained checkpoints of different Stable Diffusion versions can be **downloade
     <td>stabilityai/sd-x2-latent-upscaler</td>
     <td><a href="https://huggingface.co/stabilityai/sd-x2-latent-upscaler">stabilityai/sd-x2-latent-upscaler</a></td>
   </tr>
+    <tr>
+    <td>SinSR</td>
+    <td><a href="https://github.com/wyf0912/SinSR">SinSR_v1.pth</a></td>
+  </tr>
 
 </table>
 
@@ -130,24 +134,25 @@ It is supposed to take about an hour if run on 8 gpus.
 Our dreambooth code is from the diffusers library. Please refer to the [diffusers](https://github.com/huggingface/diffusers/tree/main/examples/dreambooth) for more details.
 
 Inference: generates examples with prompt
-```
+```python
 python infer.py \
   --model_path $DREAMBOOTH_OUTPUT_DIR \
   --output_dir $DREAMBOOTH_OUTPUT_DIR/checkpoint-1000-test-infer \
   --prompt "an sks painting including a house"
 ```
 
-Run evaluation:
-suppose the reference folder is $REF_FOLDER, where the images are generated from a SD model finetuned on the clean images.
+# Evaluation
+Suppose the reference folder is $REF_FOLDER, where the images are generated from a SD model finetuned on the clean images.
+
 First, generate FID reference stats
-```
+```bash
 # https://github.com/mseitzer/pytorch-fid
 pip install pytorch-fid
 
 python -m pytorch_fid --save-stats $REF_FOLDER evaluate/fid_ref.npz
 ```
 Compute FID and Precision
-```
+``` bash
 python evaluate/eval_fid_new.py \
       --input_folder "$DREAMBOOTH_OUTPUT_DIR/checkpoint-$FINETUNE_STEP-test-infer/an_sks_painting_including_a_house" \
       --refer evaluate/fid_ref.npz \
@@ -159,9 +164,16 @@ CUDA_VISIBLE_DEVICES=-1 python evaluate/eval_precision_new.py \
       --output_folder "$OUTPUT_DIR"
 ```
 
-Compute 
-[CMMD](https://github.com/google-research/google-research/tree/master/cmmd) distance
+To compute 
+[CMMD](https://github.com/google-research/google-research/tree/master/cmmd) distance, it is necessary to install [scenic](https://github.com/google-research/scenic).
+``` bash
+$ git clone https://github.com/google-research/scenic.git
+$ cd scenic
+$ pip install .
+$ export PYTHONPATH=$PYTHONPATH:/home/.../StyleGuard/scenic
 ```
+Then compute [CMMD](https://github.com/google-research/google-research/tree/master/cmmd) distance:
+```bash
 conda run -n cmmd python -m cmmd.main --ref_folder=$REF_FOLDER \
   --gen_folder=$DREAMBOOTH_OUTPUT_DIR/checkpoint-$FINETUNE_STEP-test-infer/an_sks_painting_including_a_house \
   --max_num=12 \
@@ -170,7 +182,7 @@ conda run -n cmmd python -m cmmd.main --ref_folder=$REF_FOLDER \
 ```
 
 run baselines (Anti-DreamBooth, SimAC)
-```
+``` bash
 bash attack_aspl.sh
 bash attack_simac.sh
 ```

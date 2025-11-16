@@ -17,9 +17,9 @@ export sd21_path="stabilityai/stable-diffusion-2-1-base"
 export ref_model_path="${sd14_path},${sd15_path},${su_upscale_path}"
 
 mkdir -p $OUTPUT_DIR
-
+export CUDA_VISIBLE_DEVICES="2,3,5,6,7"
 # excute styleguard defense to generate protective noises
-accelerate launch --num_processes=4 --gpu_ids="4,5,6,7" --config_file gpu_config.yaml --main_process_port=8833  attacks/styleguard.py \
+accelerate launch --num_processes=4 --config_file gpu_config.yaml --main_process_port=8833  attacks/styleguard.py \
   --pretrained_model_name_or_path="${sd14_path},${su_upscale_path}" \
   --enable_xformers_memory_efficient_attention \
   --instance_data_dir_for_train=$CLEAN_TRAIN_DIR \
@@ -34,7 +34,7 @@ accelerate launch --num_processes=4 --gpu_ids="4,5,6,7" --config_file gpu_config
   --prior_loss_weight=1.0 \
   --resolution=512 \
   --train_text_encoder \
-  --train_batch_size=1 \
+  --train_batch_size=4 \
   --max_train_steps=50 \
   --max_f_train_steps=3 \
   --max_adv_train_steps=6 \
@@ -43,7 +43,7 @@ accelerate launch --num_processes=4 --gpu_ids="4,5,6,7" --config_file gpu_config
   --pgd_alpha=5e-3 \
   --pgd_eps=5e-2 \
   --target_image_dir  /home/yjli/AIGC/diffusers/StyleGuard/data/target \
-  --style_loss_weight 0.1
+  --style_loss_weight 1
 
 # ------------------------- Train DreamBooth on perturbed examples -------------------------
 
@@ -59,9 +59,9 @@ python Noisy_Upscaling.py \
 
 export DREAMBOOTH_OUTPUT_DIR="/media/ssd1/yjli/dreambooth-outputs/styleguard/$EXPERIMENT_NAME/SD14"
 
+# --gpu_ids="0,1,2,3,4,5,6,7" \
 accelerate launch \
-  --num_processes=2 \
-  --gpu_ids="1,2" \
+  --num_processes=4 \
   --config_file gpu_config.yaml \
   --main_process_port=8834 \
   ../../diffusers/examples/dreambooth/train_dreambooth.py \
@@ -88,7 +88,7 @@ accelerate launch \
   --center_crop \
   --mixed_precision=fp16 \
   --prior_generation_precision=fp16 \
-  --sample_batch_size=1 \
+  --sample_batch_size=2 \
   --seed=0 \
   --snr_gamma=1.5
 

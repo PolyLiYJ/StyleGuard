@@ -3,3 +3,4 @@ token.txt
 __pycache__/
 evaluate/fid_ref.npz
 /media/ssd1/yjli
+outputs/style/wikiart/anti-dreambooth

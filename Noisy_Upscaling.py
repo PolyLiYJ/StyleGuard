@@ -53,21 +53,10 @@ def noisy_upscaling(args, image_path, upscaler_model, contronet=None):
         # in latent space
         # low_res_latents = pipeline(prompt, generator=generator, output_type="latent").images
         with torch.no_grad():
-            # noisy_image_tensor = noisy_image_tensor/2+0.5
-            # pipeline = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
-            # pipeline.to("cuda")
-            # latents = pipeline.vae.encode(noisy_image_tensor).latent_dist.sample()  # Sample from the latent distribution
-            # Scale the latents (required for Stable Diffusion)
-            # print(pipeline.vae.config.scaling_factor)
-            # latents = latents * pipeline.vae.config.scaling_factor
-            # upscaled_image = pipeline.vae.decode(latents/pipeline.vae.config.scaling_factor, return_dict=False, generator=generator)[0]
-            # upscaled_image = pipeline.image_processor.postprocess(upscaled_image, output_type="pil", do_denormalize="True")[0]
-
             upscaled_image = upscaler_model(
                prompt=prompt,
-               # image=latents,
                image=noisy_image_tensor,
-               num_inference_steps=50,
+               num_inference_steps=args.step,
                guidance_scale=0,
                generator=generator,
             ).images[0]
