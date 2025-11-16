@@ -148,20 +148,20 @@ First, generate FID reference stats
 ```bash
 # https://github.com/mseitzer/pytorch-fid
 pip install pytorch-fid
-
+export REF_FOLDER=outputs/clean
 python -m pytorch_fid --save-stats $REF_FOLDER evaluate/fid_ref.npz
 ```
 Compute FID and Precision
 ``` bash
 python evaluate/eval_fid_new.py \
-      --input_folder "$DREAMBOOTH_OUTPUT_DIR/checkpoint-$FINETUNE_STEP-test-infer/an_sks_painting_including_a_house" \
+      --input_folder outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/checkpoint-1000-test-infer \
       --refer evaluate/fid_ref.npz \
-      --output_folder "$OUTPUT_DIR"
+      --output_folder outputs
 
 CUDA_VISIBLE_DEVICES=-1 python evaluate/eval_precision_new.py \
-      --reference_folder $REF_FOLDER \
-      --gen_folder "$DREAMBOOTH_OUTPUT_DIR/checkpoint-$FINETUNE_STEP-test-infer/an_sks_painting_including_a_house" \
-      --output_folder "$OUTPUT_DIR"
+      --reference_folder outputs/clean \
+      --gen_folder outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/checkpoint-1000-test-infer \
+      --output_folder outputs
 ```
 
 To compute 
