@@ -24,19 +24,29 @@ NeurIPS 2025 poster
   - Random transformations (blur, JPEG, etc.)
   - Diffusion purification (DiffPure, Noise Upscaling)  
 
-Below are example images from the code's output folder:
 
-### Clean Image
-![Clean Image](data/wikiart/vangogh/00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)
+# Example Output Images
 
-### Protected Image
-![Protected Image](outputs/style/wikiart/anti-dreambooth/noise-ckpt/50/50_noise_00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)
+## Original Artwork
+![Clean Image](data/wikiart/vangogh/00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)  
+*Vincent van Gogh - "Orchard in Blossom Bordered by Cypresses" (1888)*
 
-### Clean Generated Image by DreamBooth-based Finetuning （prompt：A sks painting of a mountain landscale with a blue sky）
-![Clean Generated Image](outputs/clean/A-sks-painting-of-a-mountain-landscale-with-a-blue-sky.png)
+## Protected Version
+![Protected Image](outputs/style/wikiart/anti-dreambooth/noise-ckpt/50/50_noise_00006-0-vincent-van-gogh_orchard-in-blossom-bordered-by-cypresses-1888.png)  
+*Style-protected version with StyleGuard*
 
-### Adversarial Generated Image by DreamBooth-based Finetuning （prompt：A sks painting of a mountain landscale with a blue sky）
-![Adversarial Generated Image](outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/checkpoint-1000-test-infer/image_1.png)
+---
+
+## DreamBooth Generation Results
+
+### Clean Output (Unprotected)
+![Clean Generated Image](outputs/clean/A-sks-painting-of-a-mountain-landscale-with-a-blue-sky2.png)  
+**Prompt:** *"A sks painting of a mountain landscape with a blue sky"*
+
+### Adversarially Protected Output
+![Adversarial Generated Image](outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/checkpoint-1000-test-infer/image_1.png)  
+**Prompt:** *"A sks painting of a mountain landscape with a blue sky"*  
+*(StyleGuard-protected generation)*
 
 #
 
