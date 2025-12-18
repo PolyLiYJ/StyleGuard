@@ -187,7 +187,7 @@ bash attack_aspl.sh
 bash attack_simac.sh
 ```
 
-Test on the Official implementation of [Noise Upscaleing](https://github.com/ethz-spylab/robust-style-mimicry?tab=readme-ov-file#robust-mimicry-methods):
+Test on the Official implementation of [Noise Upscaling](https://github.com/ethz-spylab/robust-style-mimicry?tab=readme-ov-file#robust-mimicry-methods):
 
 ```bash
 git clone https://github.com/ethz-spylab/robust-style-mimicry.git
@@ -196,6 +196,17 @@ python robust-style-mimicry/noise.py --in_dir /home/yjli/AIGC/diffusers/StyleGua
 
 python robust-style-mimicry/upscale.py --in_dir outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/noise_upscale_official --out_dir outputs/style/wikiart/vangogh_StyleGuard_style_loss_upscaling/noise_upscale_official
 ```
+
+We also implement an alternative Noise Upscaling that contains two different upscale models:
+```bash
+python Noisy_Upscaling.py \
+  --input_folder="outputs/style/wikiart/$EXPERIMENT_NAME/noise-ckpt/50" \
+  --output_folder=$INSTANCE_DIR \
+  --upscaler="x2"
+```
+The upsclar can be x2 or x4.
+
+
 
 ## Citation
 Details of algorithms and experimental results can be found in our following paper:
