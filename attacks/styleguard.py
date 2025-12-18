@@ -876,13 +876,22 @@ def main(args):
                 # 1. f' = f.clone()
                 if "upscaler" not in model_path:
                     f_sur = copy.deepcopy(f)
+                    # f_sur = train_one_epoch(
+                    #     args,
+                    #     f_sur,
+                    #     tokenizer,
+                    #     noise_scheduler,
+                    #     vae,
+                    #     clean_data_batch,
+                    #     args.max_f_train_steps,
+                    # )
                     f_sur = train_one_epoch(
                         args,
                         f_sur,
                         tokenizer,
                         noise_scheduler,
                         vae,
-                        clean_data_batch,
+                        perturbed_data_batch,
                         args.max_f_train_steps,
                     )
                     perturbed_data_f_batch = pgd_attack(
